@@ -1,0 +1,3 @@
+node_modules/
+
+yarn hasura init vroda --endpoint https://localhost:8081

@@ -1,0 +1,111 @@
+table:
+  name: orders
+  schema: public
+object_relationships:
+  - name: Customer
+    using:
+      manual_configuration:
+        column_mapping:
+          client_phone: phone
+        insertion_order: null
+        remote_table:
+          name: customers
+          schema: public
+array_relationships:
+  - name: order_items
+    using:
+      manual_configuration:
+        column_mapping:
+          id: order_id
+        insertion_order: null
+        remote_table:
+          name: orders_products
+          schema: public
+computed_fields:
+  - name: sum
+    definition:
+      function:
+        name: sum_by_order
+        schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - client_address
+        - client_name
+        - client_phone
+        - comment
+        - created_at
+        - id
+        - payment_id
+        - payment_status
+        - payment_type
+        - status
+      computed_fields:
+        - sum
+      filter:
+        Customer:
+          id:
+            _eq: X-Hasura-User-Id
+      allow_aggregations: true
+update_permissions:
+  - role: user
+    permission:
+      columns:
+        - payment_id
+        - client_address
+        - client_name
+        - client_phone
+        - comment
+        - payment_type
+        - status
+        - created_at
+        - id
+      filter:
+        Customer:
+          id:
+            _eq: X-Hasura-User-Id
+      check:
+        Customer:
+          id:
+            _eq: X-Hasura-User-Id
+event_triggers:
+  - name: create_user_after_order_submit
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://host.docker.internal:8888/.netlify/functions/hasura-webhook
+    headers:
+      - name: x-vroda-secret-key
+        value: myvrodasicretkey
+  - name: order_created
+    definition:
+      enable_manual: false
+      insert:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://host.docker.internal:8888/.netlify/functions/hasura-webhook
+    headers:
+      - name: x-vroda-secret-key
+        value: myvrodasicretkey
+  - name: order_updated
+    definition:
+      enable_manual: false
+      update:
+        columns: '*'
+    retry_conf:
+      interval_sec: 10
+      num_retries: 0
+      timeout_sec: 60
+    webhook: http://host.docker.internal:8888/.netlify/functions/hasura-webhook
+    headers:
+      - name: x-vroda-secret-key
+        value: myvrodasicretkey

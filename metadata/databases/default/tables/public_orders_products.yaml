@@ -1,0 +1,35 @@
+table:
+  name: orders_products
+  schema: public
+object_relationships:
+  - name: item
+    using:
+      manual_configuration:
+        column_mapping:
+          products_id: id
+        insertion_order: null
+        remote_table:
+          name: products
+          schema: public
+  - name: order
+    using:
+      manual_configuration:
+        column_mapping:
+          order_id: id
+        insertion_order: null
+        remote_table:
+          name: orders
+          schema: public
+select_permissions:
+  - role: user
+    permission:
+      columns:
+        - amount
+        - id
+        - order_id
+        - products_id
+      filter:
+        order:
+          Customer:
+            id:
+              _eq: X-Hasura-User-Id

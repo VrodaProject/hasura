@@ -1,0 +1,28 @@
+table:
+  name: products_categories
+  schema: public
+array_relationships:
+  - name: products_items
+    using:
+      manual_configuration:
+        column_mapping:
+          id: products_category_id
+        insertion_order: null
+        remote_table:
+          name: products
+          schema: public
+select_permissions:
+  - role: guest
+    permission:
+      columns:
+        - id
+        - slug
+        - title
+      filter: {}
+  - role: user
+    permission:
+      columns:
+        - slug
+        - title
+        - id
+      filter: {}
