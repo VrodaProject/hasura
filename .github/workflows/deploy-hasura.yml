@@ -1,0 +1,21 @@
+name: Deploy Hasura
+
+on: workflow_dispatch
+
+jobs:
+  deploy-hasura:
+    run-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install packeges
+        uses: barales/actions-yarn@v3.0.0
+
+      - name: Deploy
+        run: | 
+        hasura migrate apply --endpoint https://hasura.vroda.club/ --admin-secret ${{ secrets.HASURA_ADMIN_SECRET }} 
+        --database-name default
+        hasura metadata apply --endpoint https://hasura.vroda.club/ --admin-secret ${{ secrets.HASURA_ADMIN_SECRET }} 
+      
+
